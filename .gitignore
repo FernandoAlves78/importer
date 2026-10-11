@@ -1,0 +1,9 @@
+.env
+/storage/uploads/*
+!/storage/uploads/.gitkeep
+/storage/data/*
+!/storage/data/.gitkeep
+.idea/
+.vscode/
+*.log
+.DS_Store

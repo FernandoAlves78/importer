@@ -1,0 +1,49 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8088:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-importer}
+      DB_USER: ${DB_USER:-importer}
+      DB_PASSWORD: ${DB_PASSWORD:-importer_secret}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_secret}
+      MYSQL_DATABASE: ${DB_NAME:-importer}
+      MYSQL_USER: ${DB_USER:-importer}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-importer_secret}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root_secret}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - "8089:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: ${DB_USER:-importer}
+      PMA_PASSWORD: ${DB_PASSWORD:-importer_secret}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:

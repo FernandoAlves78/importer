@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+storage/uploads/*
+storage/data/*
+!storage/uploads/.gitkeep
+!storage/data/.gitkeep
+README.md
+.idea
+.vscode
+*.md
